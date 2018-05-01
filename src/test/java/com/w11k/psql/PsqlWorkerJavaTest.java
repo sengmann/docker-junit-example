@@ -2,6 +2,7 @@ package com.w11k.psql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.flywaydb.core.Flyway;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,11 @@ public class PsqlWorkerJavaTest {
         hikariConfig.setUsername(postgres.getUsername());
         hikariConfig.setPassword(postgres.getPassword());
         HikariDataSource ds = new HikariDataSource(hikariConfig);
-        this.worker = new PsqlWorker(ds, true);
+        Flyway flyway = new Flyway();
+        flyway.setDataSource(ds);
+        flyway.clean();
+        flyway.migrate();
+        this.worker = new PsqlWorker(ds, false);
     }
 
     @Test
