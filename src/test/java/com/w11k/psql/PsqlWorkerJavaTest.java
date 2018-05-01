@@ -11,6 +11,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PsqlWorkerJavaTest {
+    // @Rule says start container before every run
     @Rule
     public PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:10.3-alpine")
             .withDatabaseName("test_database")
@@ -21,16 +22,22 @@ public class PsqlWorkerJavaTest {
 
     @BeforeEach
     public void setupDatasource() {
+        // call start container to be sure it is up and running
         postgres.start();
+
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(postgres.getJdbcUrl());
         hikariConfig.setUsername(postgres.getUsername());
         hikariConfig.setPassword(postgres.getPassword());
         HikariDataSource ds = new HikariDataSource(hikariConfig);
+
+        // migrate schema with flyway
         Flyway flyway = new Flyway();
         flyway.setDataSource(ds);
         flyway.clean();
         flyway.migrate();
+
+        // init testee
         this.worker = new PsqlWorker(ds, false);
     }
 
