@@ -30,7 +30,7 @@ public class PsqlWorkerJavaTest {
         hikariConfig.setUsername(postgres.getUsername());
         hikariConfig.setPassword(postgres.getPassword());
         HikariDataSource ds = new HikariDataSource(hikariConfig);
-
+        System.out.println(postgres.getJdbcUrl());
         // migrate schema with flyway
         Flyway flyway = new Flyway();
         flyway.setDataSource(ds);
